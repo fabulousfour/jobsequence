@@ -1,0 +1,34 @@
+import org.apache.hadoop.conf.Configured;  
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*; 
+import org.apache.hadoop.util.*;
+
+public class Driver extends Configured implements Tool{
+	public int run(String[] args) throws Exception {
+		JobConf job = new JobConf(Driver.class); 
+		if(args.length <2) {
+			System.err.println("Usage:<inputpath> <outputpath>");
+			System.exit(-1);
+		}		
+		//job.set("fs.file.impl", "WinLocalFileSystem");
+		job.setJarByClass(Driver.class);		
+				
+		job.setMapperClass(MapperTest.class);
+		job.setReducerClass(ReducerTest.class); 
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(IntWritable.class);  
+		
+		FileInputFormat.addInputPath(job, new Path(args[0]));  	
+		FileOutputFormat.setOutputPath(job, new Path(args[1])); 
+		
+		JobClient.runJob(job);
+		return 0;			
+	}
+	public static void main(String[] args) throws Exception {
+		int exitCode = ToolRunner.run(new Driver(), args);
+		System.exit(exitCode);
+	}
+}
+
+ 
